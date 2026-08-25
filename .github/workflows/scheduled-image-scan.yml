@@ -9,8 +9,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   base-image-scan:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      security-events: write  # for github/codeql-action/upload-sarif to upload SARIF results
     name: scan images
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -28,6 +34,11 @@ jobs:
           ]
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
@@ -61,6 +72,9 @@ jobs:
           category: ${{ matrix.image.name }}
 
   predictor-image-scan:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      security-events: write  # for github/codeql-action/upload-sarif to upload SARIF results
     name: scan predictor images
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -78,6 +92,11 @@ jobs:
           ]
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
@@ -111,6 +130,9 @@ jobs:
           category: ${{ matrix.image.name }}
 
   explainer-image-scan:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      security-events: write  # for github/codeql-action/upload-sarif to upload SARIF results
     name: scan explainer images
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -120,6 +142,11 @@ jobs:
         image: [{ name: art-explainer, file: python/artexplainer.Dockerfile }]
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
