@@ -12,13 +12,24 @@ on:
     - cron: '0 0 * * 0'
   workflow_dispatch: { }
 
+permissions:
+  contents: read
+
 jobs:
   go-security-scan:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      security-events: write  # for github/codeql-action/upload-sarif to upload SARIF results
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
       GO111MODULE: on
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 

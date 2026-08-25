@@ -5,6 +5,9 @@ on:
     types: [ checks_requested ]
   issue_comment:
     types: [created]
+permissions:
+  contents: read
+
 jobs:
   enforce-all-checks:
     if: >-
@@ -16,6 +19,11 @@ jobs:
     permissions:
       checks: read
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+
       - name: job status check
         uses: lewagon/wait-on-check-action@1d57e2c51a58d812d2765e036a028b6bdb5a6154 # v1.8.1
         with:
